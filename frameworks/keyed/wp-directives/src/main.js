@@ -1,9 +1,5 @@
-import { hydrate, createContext } from "preact";
+import { hydrate, createContext, cloneElement } from "preact";
 import { useState, useEffect, useContext } from "preact/hooks";
-
-/**
- * Internal dependencies
- */
 import toVdom from "./vdom";
 import { directive } from "./directives";
 import { createRootFragment, idle } from "./utils";
@@ -72,6 +68,31 @@ directive("class", ({ directives: { class: className }, element }) => {
     });
 });
 
+// wp-for:[item]
+directive("for", ({ directives: { for: listGetter }, element }) => {
+  const [context, setContext] = useContext(ctx);
+  const itemName = Object.keys(className)
+    .filter((n) => n !== "default")
+    .find((n) => n);
+
+  const cb = eval(`(${listGetter[itemName]})`);
+  const list = cb({ context, setContext });
+
+  const templateContent = element.children;
+
+  element.children = list.map((item) => (
+    <ItemProvider name={itemName} value={item}>
+      {cloneElement(templateContent)}
+    </ItemProvider>
+  ));
+});
+
+const ItemProvider = ({ name, value, children }) => {
+  const [_, setContext] = useContext(ctx);
+  setContext({ name, value });
+  return children;
+};
+
 /**
  * Initialize the initial vDOM.
  */
@@ -85,6 +106,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   await idle(); // Wait until the CPU is idle to do the hydration.
   const vdom = toVdom(document.body);
   hydrate(vdom, rootFragment);
+
+  debugger;
 
   // eslint-disable-next-line no-console
   console.log("hydrated!");

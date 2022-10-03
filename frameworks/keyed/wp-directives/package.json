@@ -1,0 +1,36 @@
+{
+  "name": "js-framework-benchmark-wp-directives",
+  "version": "0.1.0",
+  "description": "Benchmark for wp directives",
+  "js-framework-benchmark": {
+    "frameworkVersionFromPackage": ""
+  },
+  "scripts": {
+    "build-dev": "webpack -w -d",
+    "build-prod": "webpack"
+  },
+  "keywords": [
+    ""
+  ],
+  "author": "Mario Santos",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/krausest/js-framework-benchmark",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krausest/js-framework-benchmark.git"
+  },
+  "devDependencies": {
+    "babel-minify-webpack-plugin": "0.3.1",
+    "@babel/core": "7.16.7",
+    "@babel/preset-env": "7.16.8",
+    "@babel/preset-react": "7.16.7",
+    "@babel/plugin-proposal-class-properties": "7.16.7",
+    "babel-loader": "8.2.3",
+    "webpack": "4.44.2",
+    "webpack-cli": "3.3.12"
+  },
+  "dependencies": {
+    "@babel/plugin-transform-react-jsx": "7.16.7",
+    "preact": "10.7.3"
+  }
+}

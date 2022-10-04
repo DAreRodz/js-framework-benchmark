@@ -29,7 +29,7 @@ export default () => {
       Object.values(effect).forEach((callback) => {
         useEffect(() => {
           const cb = getCallback(callback);
-          cb({ context, setContext, tick, ref: element.ref.current });
+          cb({ context, setContext, ref: element.ref.current });
         });
       });
     }

@@ -2,7 +2,7 @@ import { useContext, useMemo } from "preact/hooks";
 import { useSignalEffect } from "@preact/signals";
 import { directive } from "./hooks";
 import { deepSignal } from "./deep-signal";
-import { getCallback } from "./utils";
+import { getCallback, deepMerge } from "./utils";
 
 const raf = window.requestAnimationFrame;
 // Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
@@ -42,7 +42,7 @@ export default () => {
     Object.entries(on).forEach(([name, callback]) => {
       element.props[`on${name}`] = (event) => {
         const cb = getCallback(callback);
-        cb({ context, event });
+        cb({ context, event }, ...args);
       };
     });
   });
@@ -83,21 +83,22 @@ export default () => {
     "each",
     ({ directives: { each, key }, element, context: mainContext }) => {
       const context = useContext(mainContext);
-      const list = getCallback(each.default)({ context });
+      const [name, callback] = Object.entries(each)
+        .filter((n) => n !== "default")
+        .find((n) => n);
+
+      const list = getCallback(callback)({ context });
 
       const templateContent = element.children;
 
       element.children = list.map((item) => (
-        <ItemProvider name={itemName} value={item} key={item[key]}>
+        <mainContext.Provider
+          value={deepMerge(context, { [name]: item })}
+          key={item[key]}
+        >
           {cloneElement(templateContent)}
-        </ItemProvider>
+        </mainContext.Provider>
       ));
     }
   );
-
-  const ItemProvider = ({ name, value, children }) => {
-    const [_, setContext] = useContext(ctx);
-    setContext({ name, value });
-    return children;
-  };
 };

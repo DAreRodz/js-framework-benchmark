@@ -54,16 +54,18 @@ const isObject = (item) =>
   item && typeof item === "object" && !Array.isArray(item);
 
 export const deepMerge = (target, source) => {
+  const output = Object.assign({}, target);
   if (isObject(target) && isObject(source)) {
     for (const key in source) {
       if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} });
-        deepMerge(target[key], source[key]);
+        if (!output[key]) Object.assign(output, { [key]: {} });
+        deepMerge(output[key], source[key]);
       } else {
-        Object.assign(target, { [key]: source[key] });
+        Object.assign(output, { [key]: source[key] });
       }
     }
   }
+  return output;
 };
 
 // Get callback.

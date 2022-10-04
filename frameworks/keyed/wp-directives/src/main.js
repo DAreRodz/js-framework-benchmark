@@ -6,8 +6,14 @@ wpx({
     data({ context }) {
       return context.data;
     },
-    isSelected({ context }, { id }) {
-      return (context.selected = id);
+    isSelected({ context }) {
+      return (context.selected = context.item.id);
+    },
+    itemId({ context }) {
+      return context.item.id;
+    },
+    itemLabel({ context }) {
+      return context.item.label;
     },
   },
   actions: {
@@ -23,8 +29,8 @@ wpx({
         context.data[i].label += " !!!";
       }
     },
-    remove({ context }, { id }) {
-      const idx = context.data.findIndex((d) => d.id === id);
+    remove({ context }) {
+      const idx = context.data.findIndex((d) => d.id === context.item.id);
       context.data.splice(idx, 1);
     },
     run({ context }) {
@@ -35,8 +41,8 @@ wpx({
       context.data = buildData(10000);
       context.selected = undefined;
     },
-    select({ context }, { id }) {
-      context.selected = id;
+    select({ context }) {
+      context.selected = context.item.id;
     },
     swapRows({ context }) {
       const d = context.data;

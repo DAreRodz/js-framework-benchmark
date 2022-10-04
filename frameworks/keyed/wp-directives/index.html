@@ -53,14 +53,13 @@
     <table class="table table-hover table-striped test-data">
       <tbody>
         <template wp-each:item="state.data" wp-key="id">
-          <tr wp-class:danger="state.isSelected(item)">
-            <td class="col-md-1" wp-bind:children="item.id"></td>
+          <tr wp-class:danger="state.isSelected" wp-context="{}">
+            <td class="col-md-1" wp-bind:children="state.itemId"></td>
             <td class="col-md-4">
-              <a wp-on:click="actions.select(item)" wp-bind:children="item.label"></a>
+              <a wp-on:click="actions.select" wp-bind:children="state.itemLabel"></a>
             </td>
             <td class="col-md-1">
-              <a wp-on:click="actions.remove(item)"><span class="glyphicon glyphicon-remove"
-                  aria-hidden="true"></span></a>
+              <a wp-on:click="actions.remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
             </td>
             <td class="col-md-6"></td>
           </tr>

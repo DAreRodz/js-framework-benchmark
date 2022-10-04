@@ -30,7 +30,12 @@ export default function toVdom(node) {
   if (hasWpDirectives) props.wp = wpDirectives;
 
   // Walk child nodes and return vDOM children.
-  const children = [].map.call(node.childNodes, toVdom).filter(exists);
+  const childNodes =
+    node instanceof HTMLTemplateElement
+      ? node.content.childNodes
+      : node.childNodes;
+
+  const children = [].map.call(childNodes, toVdom).filter(exists);
 
   return h(node.localName, props, children);
 }

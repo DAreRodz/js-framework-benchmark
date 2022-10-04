@@ -93,7 +93,7 @@ export default () => {
 
       return list.map((item) => (
         <mainContext.Provider
-          value={multiDeepMerge({}, context, { [name]: item })}
+          value={{ ...context, [name]: item }}
           key={item[key]}
         >
           {element.props.children}

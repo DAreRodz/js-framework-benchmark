@@ -1,30 +1,50 @@
 import wpx from "./wpx";
+import buildData from "./build-data";
 
 wpx({
-  core: {
-    navigation: {
-      openMenu: ({ context: { navigation } }) => {
-        navigation.open = true;
-        navigation.previousElementWithFocus = window.document.activeElement;
-      },
-      closeMenu: ({ context: { navigation } }) => {
-        navigation.open = false;
-      },
-      isMenuOpen: ({ context: { navigation } }) => navigation.open,
-      isMenuClosed: ({ context: { navigation } }) => !navigation.open,
-      addFirstElementToContext: ({ context: { navigation }, ref }) => {
-        navigation.firstMenuElement = ref;
-      },
-      focusFirstElement: async ({ context: { navigation }, tick }) => {
-        if (navigation.open) {
-          await tick(); // We need to wait until the DOM is updated.
-          navigation.firstMenuElement.focus();
-        }
-      },
-      focusLastFocusedElement: ({ context: { navigation } }) => {
-        if (!navigation.open && navigation.previousElementWithFocus)
-          navigation.previousElementWithFocus.focus();
-      },
+  state: {
+    data({ context }) {
+      return context.data;
+    },
+    isSelected({ context }, { id }) {
+      return (context.selected = id);
+    },
+  },
+  actions: {
+    add({ context }) {
+      context.data = context.data.concat(buildData(1000));
+    },
+    clear({ context }) {
+      context.data = [];
+      context.selected = undefined;
+    },
+    update({ context }) {
+      for (let i = 0; i < context.data.length; i += 10) {
+        context.data[i].label += " !!!";
+      }
+    },
+    remove({ context }, { id }) {
+      const idx = context.data.findIndex((d) => d.id === id);
+      context.data.splice(idx, 1);
+    },
+    run({ context }) {
+      context.data = buildData(1000);
+      context.selected = undefined;
+    },
+    runLots({ context }) {
+      context.data = buildData(10000);
+      context.selected = undefined;
+    },
+    select({ context }, { id }) {
+      context.selected = id;
+    },
+    swapRows({ context }) {
+      const d = context.data;
+      if (d.length > 998) {
+        const tmp = d[998];
+        d[998] = d[1];
+        d[1] = tmp;
+      }
     },
   },
 });

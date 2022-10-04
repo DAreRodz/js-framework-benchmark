@@ -78,24 +78,22 @@ export default () => {
     }
   );
 
-  // wp-for:[item]
-  directive("for", ({ directives: { for: listGetter }, element }) => {
-    const [context, setContext] = useContext(ctx);
-    const itemName = Object.keys(className)
-      .filter((n) => n !== "default")
-      .find((n) => n);
+  // wp-each
+  directive(
+    "each",
+    ({ directives: { each, key }, element, context: mainContext }) => {
+      const context = useContext(mainContext);
+      const list = getCallback(each.default)({ context });
 
-    const cb = eval(`(${listGetter[itemName]})`);
-    const list = cb({ context, setContext });
+      const templateContent = element.children;
 
-    const templateContent = element.children;
-
-    element.children = list.map((item) => (
-      <ItemProvider name={itemName} value={item}>
-        {cloneElement(templateContent)}
-      </ItemProvider>
-    ));
-  });
+      element.children = list.map((item) => (
+        <ItemProvider name={itemName} value={item} key={item[key]}>
+          {cloneElement(templateContent)}
+        </ItemProvider>
+      ));
+    }
+  );
 
   const ItemProvider = ({ name, value, children }) => {
     const [_, setContext] = useContext(ctx);

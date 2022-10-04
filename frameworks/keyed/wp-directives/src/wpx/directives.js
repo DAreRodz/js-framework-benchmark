@@ -2,7 +2,7 @@ import { useContext, useMemo } from "preact/hooks";
 import { useSignalEffect } from "@preact/signals";
 import { directive } from "./hooks";
 import { deepSignal } from "./deep-signal";
-import { getCallback, deepMerge } from "./utils";
+import { getCallback, multiDeepMerge } from "./utils";
 
 const raf = window.requestAnimationFrame;
 // Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
@@ -81,7 +81,7 @@ export default () => {
   // wp-each
   directive(
     "each",
-    ({ directives: { each, key }, element, context: mainContext }) => {
+    ({ directives: { each, key }, context: mainContext, element }) => {
       const context = useContext(mainContext);
       const [name, callback] = Object.entries(each)
         .filter((n) => n !== "default")
@@ -89,14 +89,14 @@ export default () => {
 
       const list = getCallback(callback)({ context });
 
-      const templateContent = element.children;
+      if (!list.length) return null;
 
-      element.children = list.map((item) => (
+      return list.map((item) => (
         <mainContext.Provider
-          value={deepMerge(context, { [name]: item })}
+          value={multiDeepMerge({}, context, { [name]: item })}
           key={item[key]}
         >
-          {cloneElement(templateContent)}
+          {element.props.children}
         </mainContext.Provider>
       ));
     }

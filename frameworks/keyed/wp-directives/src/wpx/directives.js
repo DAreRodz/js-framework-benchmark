@@ -1,12 +1,6 @@
-import { useContext, useMemo } from "preact/hooks";
-import { useSignalEffect } from "@preact/signals";
+import { useContext, useState, useEffect } from "preact/hooks";
 import { directive } from "./hooks";
-import { deepSignal } from "./deep-signal";
-import { getCallback, multiDeepMerge } from "./utils";
-
-const raf = window.requestAnimationFrame;
-// Until useSignalEffects is fixed: https://github.com/preactjs/signals/issues/228
-const tick = () => new Promise((r) => raf(() => raf(r)));
+import { getCallback } from "./utils";
 
 export default () => {
   // wp-context
@@ -17,8 +11,13 @@ export default () => {
       props: { children },
       context: { Provider },
     }) => {
-      const signals = useMemo(() => deepSignal(context.default), []);
-      return <Provider value={signals}>{children}</Provider>;
+      const [contextValue, setContext] = useState(context.default);
+      const setMergedContext = (newContext) => {
+        setContext({ ...contextValue, ...newContext });
+      };
+      return (
+        <Provider value={[contextValue, setMergedContext]}>{children}</Provider>
+      );
     }
   );
 
@@ -26,11 +25,11 @@ export default () => {
   directive(
     "effect",
     ({ directives: { effect }, element, context: mainContext }) => {
-      const context = useContext(mainContext);
+      const [context, setContext] = useContext(mainContext);
       Object.values(effect).forEach((callback) => {
-        useSignalEffect(() => {
+        useEffect(() => {
           const cb = getCallback(callback);
-          cb({ context, tick, ref: element.ref.current });
+          cb({ context, setContext, tick, ref: element.ref.current });
         });
       });
     }
@@ -38,11 +37,11 @@ export default () => {
 
   // wp-on:[event]
   directive("on", ({ directives: { on }, element, context: mainContext }) => {
-    const context = useContext(mainContext);
+    const [context, setContext] = useContext(mainContext);
     Object.entries(on).forEach(([name, callback]) => {
       element.props[`on${name}`] = (event) => {
         const cb = getCallback(callback);
-        cb({ context, event });
+        cb({ context, setContext, event });
       };
     });
   });
@@ -51,12 +50,12 @@ export default () => {
   directive(
     "class",
     ({ directives: { class: className }, element, context: mainContext }) => {
-      const context = useContext(mainContext);
+      const [context, setContext] = useContext(mainContext);
       Object.keys(className)
         .filter((n) => n !== "default")
         .forEach((name) => {
           const cb = getCallback(className[name]);
-          const result = cb({ context });
+          const result = cb({ context, setContext });
           if (!result) element.props.class.replace(name, "");
           else if (!element.props.class.includes(name))
             element.props.class += ` ${name}`;
@@ -68,12 +67,12 @@ export default () => {
   directive(
     "bind",
     ({ directives: { bind }, element, context: mainContext }) => {
-      const context = useContext(mainContext);
+      const [context, setContext] = useContext(mainContext);
       Object.entries(bind)
         .filter((n) => n !== "default")
         .forEach(([attribute, callback]) => {
           const cb = getCallback(callback);
-          element.props[attribute] = cb({ context });
+          element.props[attribute] = cb({ context, setContext });
         });
     }
   );
@@ -82,18 +81,18 @@ export default () => {
   directive(
     "each",
     ({ directives: { each, key }, context: mainContext, element }) => {
-      const context = useContext(mainContext);
+      const [context, setContext] = useContext(mainContext);
       const [name, callback] = Object.entries(each)
         .filter((n) => n !== "default")
         .find((n) => n);
 
-      const list = getCallback(callback)({ context });
+      const list = getCallback(callback)({ context, setContext });
 
       if (!list.length) return null;
 
       return list.map((item) => (
         <mainContext.Provider
-          value={{ ...context, [name]: item }}
+          value={[{ ...context, [name]: item }, setContext]}
           key={item[key]}
         >
           {element.props.children}

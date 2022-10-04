@@ -17,40 +17,48 @@ wpx({
     },
   },
   actions: {
-    add({ context }) {
+    add({ context, setContext }) {
       context.rows.data = context.rows.data.concat(buildData(1000));
+      setContext(context);
     },
-    clear({ context }) {
+    clear({ context, setContext }) {
       context.rows.data = [];
       context.rows.selected = undefined;
+      setContext(context);
     },
-    update({ context }) {
+    update({ context, setContext }) {
       for (let i = 0; i < context.rows.data.length; i += 10) {
         context.rows.data[i].label += " !!!";
       }
+      setContext(context);
     },
-    remove({ context }) {
+    remove({ context, setContext }) {
       const idx = context.rows.data.findIndex((d) => d.id === context.item.id);
       context.rows.data.splice(idx, 1);
+      setContext(context);
     },
-    run({ context }) {
+    run({ context, setContext }) {
       context.rows.data = buildData(1000);
       context.rows.selected = undefined;
+      setContext(context);
     },
-    runLots({ context }) {
+    runLots({ context, setContext }) {
       context.rows.data = buildData(10000);
       context.rows.selected = undefined;
+      setContext(context);
     },
-    select({ context }) {
+    select({ context, setContext }) {
       context.rows.selected = context.item.id;
+      setContext(context);
     },
-    swapRows({ context }) {
+    swapRows({ context, setContext }) {
       const d = context.rows.data;
       if (d.length > 998) {
         const tmp = d[998];
         d[998] = d[1];
         d[1] = tmp;
       }
+      setContext(context);
     },
   },
 });

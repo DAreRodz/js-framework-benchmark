@@ -1,3 +1,4 @@
+import "preact/debug";
 import wpx from "./wpx";
 import buildData from "./build-data";
 
@@ -7,7 +8,7 @@ wpx({
       return context.data;
     },
     isSelected({ context }) {
-      return (context.selected = context.item.id);
+      return context.selected === context.item.id;
     },
     itemId({ context }) {
       return context.item.id;

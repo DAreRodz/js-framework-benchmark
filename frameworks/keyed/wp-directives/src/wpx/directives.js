@@ -42,7 +42,7 @@ export default () => {
     Object.entries(on).forEach(([name, callback]) => {
       element.props[`on${name}`] = (event) => {
         const cb = getCallback(callback);
-        cb({ context, event }, ...args);
+        cb({ context, event });
       };
     });
   });

@@ -93,7 +93,7 @@ export default () => {
       return list.map((item) => (
         <mainContext.Provider
           value={[{ ...context, [name]: item }, setContext]}
-          key={item[key]}
+          key={item[key.default]}
         >
           {element.props.children}
         </mainContext.Provider>

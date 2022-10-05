@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Benchmark for wp directives",
   "js-framework-benchmark": {
-    "frameworkVersionFromPackage": ""
+    "frameworkVersion": "0.1.0"
   },
   "scripts": {
     "build-dev": "webpack -w -d",

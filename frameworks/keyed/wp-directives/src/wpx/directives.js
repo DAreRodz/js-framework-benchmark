@@ -95,7 +95,7 @@ export default () => {
           value={[{ ...context, [name]: item }, setContext]}
           key={item[key.default]}
         >
-          {element.props.children}
+          {element.props.children[1]}
         </mainContext.Provider>
       ));
     }
